@@ -55,14 +55,14 @@
 
     <script>
       const copyHandler = (event) => {
-        if (event.keyCode === 3 && event.ctrlKey) {
-          //CTRL+C
+        if (event.keyCode === 3 && event.ctrlKey) { //CTRL+C
           const canvasName = $(event.target).attr("target");
           const canvasObj = window[canvasName];
           const obj = canvasObj.getActiveObject();
           if (obj) {
             const activeObjectJSON = obj.toJSON();
-            navigator.clipboard.writeText(JSON.stringify(activeObjectJSON));
+            const jsonString = JSON.stringify(activeObjectJSON);
+            navigator.clipboard.writeText(jsonString);
           } else {
             navigator.clipboard.writeText("");
           }
@@ -70,25 +70,22 @@
       };
 
       const pasteHandler = async (event) => {
-        if (event.keyCode === 22 && event.ctrlKey) {
-          //CTRL+V
-          const jsonString = await navigator.clipboard.readText();
-          if (jsonString) {
-            try {
-              const activeObjectJSON = JSON.parse(jsonString);
-              const canvasName = $(event.target).attr("target");
-              const canvasObj = window[canvasName];
+        if (event.keyCode === 22 && event.ctrlKey) { //CTRL+V
+          try {
+            const jsonString = await navigator.clipboard.readText();
+            const activeObjectJSON = JSON.parse(jsonString);
+            const canvasName = $(event.target).attr("target");
+            const canvasObj = window[canvasName];
 
-              switch (activeObjectJSON.type) {
-                case "rect":
-                  const rect = new fabric.Rect(activeObjectJSON);
-                  canvasObj.add(rect);
-                  canvasObj.setActiveObject(rect);
-                  break;
-              }
-            } catch (e) {
-              console.log(e);
+            switch (activeObjectJSON.type) {
+              case "rect":
+                const rect = new fabric.Rect(activeObjectJSON);
+                canvasObj.add(rect);
+                canvasObj.setActiveObject(rect);
+                break;
             }
+          } catch (e) {
+            console.log(e);
           }
         }
       };
