@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, shrink-to-fit=no"
+    />
+
+    <title><%= title %></title>
+
+    <link
+      rel="stylesheet"
+      href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+      integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
+      crossorigin="anonymous"
+    />
+
+    <link rel="stylesheet" href="/stylesheets/style.css" />
+  </head>
+  <body>
+    <div class="container">
+      <div class="row">
+        <div id="wrapper1" class="col col-6" tabindex="99" target="canvas1">
+          <canvas id="canvas1" height="300px"></canvas>
+        </div>
+        <div id="wrapper2" class="col col-6" tabindex="100" target="canvas2">
+          <canvas id="canvas2" height="300px"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <script
+      src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
+      integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+      integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
+      integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+      crossorigin="anonymous"
+    ></script>
+
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/4.3.1/fabric.min.js"
+      integrity="sha512-ACqMrfAtm537AWzgx/xQ57JnFxXeq8RylQMGg4y/e6M2ew4Z8NycE8aId/Bt2ZE+w1gNsox3MgwxKl7SGMRdtA=="
+      crossorigin="anonymous"
+    ></script>
+
+    <script>
+      const copyHandler = (event) => {
+        if (event.keyCode === 3 && event.ctrlKey) {
+          //CTRL+C
+          const canvasName = $(event.target).attr("target");
+          const canvasObj = window[canvasName];
+          const obj = canvasObj.getActiveObject();
+          if (obj) {
+            const activeObjectJSON = obj.toJSON();
+            navigator.clipboard.writeText(JSON.stringify(activeObjectJSON));
+          } else {
+            navigator.clipboard.writeText("");
+          }
+        }
+      };
+
+      const pasteHandler = async (event) => {
+        if (event.keyCode === 22 && event.ctrlKey) {
+          //CTRL+V
+          const jsonString = await navigator.clipboard.readText();
+          if (jsonString) {
+            try {
+              const activeObjectJSON = JSON.parse(jsonString);
+              const canvasName = $(event.target).attr("target");
+              const canvasObj = window[canvasName];
+
+              switch (activeObjectJSON.type) {
+                case "rect":
+                  const rect = new fabric.Rect(activeObjectJSON);
+                  canvasObj.add(rect);
+                  canvasObj.setActiveObject(rect);
+                  break;
+              }
+            } catch (e) {
+              console.log(e);
+            }
+          }
+        }
+      };
+    </script>
+
+    <script>
+      const source = document.querySelector("#wrapper1");
+      source.addEventListener("keypress", copyHandler);
+      source.addEventListener("keypress", pasteHandler);
+
+      const target = document.querySelector("#wrapper2");
+      target.addEventListener("keypress", pasteHandler);
+      target.addEventListener("keypress", copyHandler);
+    </script>
+
+    <script>
+      var canvas1 = new fabric.Canvas("canvas1");
+
+      var rect1 = new fabric.Rect({
+        top: 100,
+        left: 100,
+        width: 60,
+        height: 70,
+        fill: "red",
+      });
+
+      canvas1.add(rect1);
+
+      var canvas2 = new fabric.Canvas("canvas2");
+
+      var rect2 = new fabric.Rect({
+        top: 120,
+        left: 140,
+        width: 60,
+        height: 70,
+        fill: "green",
+      });
+
+      canvas2.add(rect2);
+    </script>
+  </body>
+</html>
